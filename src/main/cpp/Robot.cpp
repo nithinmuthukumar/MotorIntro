@@ -8,6 +8,11 @@
 #include <frc/Joystick.h>
 #include <frc/PWMVictorSPX.h>
 #include <frc/TimedRobot.h>
+#include <frc/livewindow/LiveWindow.h>
+#include <frc/RobotDrive.h>
+#include "ctre/Phoenix.h"
+
+using namespace frc;
 /**
  * This sample program shows how to control a motor using a joystick. In the
  * operator control part of the program, the joystick is read and the value is
@@ -18,13 +23,45 @@
  */
 
 class Robot : public frc::TimedRobot {
- public:
-  void TeleopPeriodic() override { m_motor.Set(m_stick.GetY()); }
+  Joystick m_stick{0};
+  RobotDrive driveSys; // robot drive system
+  PWMVictorSPX m_motor{0};
+  LiveWindow *lw;
+  int autoLoopCounter;
+  
 
- private:
-  frc::Joystick m_stick{0};
-  frc::PWMVictorSPX m_motor{0};
+  Robot():
+    driveSys(0,1), //these must be initialized in the same order stick(1), //as they are declared above.
+    lw(NULL),
+    autoLoopCounter(0)
+    {
+      driveSys.SetExpiration(0.1); 
+    }
+  void RobotInit() override{
+      lw = LiveWindow::GetInstance();
+  }
+  void TeleopInit() override {
+
+  }
+  void TeleopPeriodic() override { 
+    m_motor.Set(m_stick.GetY());
+  }
+  void AutonomousInit() override {
+    autoLoopCounter = 0;
+
+  }
+  void AutonomousPeriodic() override {
+    autoLoopCounter=0;
+    if(autoLoopCounter<100){
+      autoLoopCounter++;
+      driveSys.Drive(1,0.5);
+
+
+    }
+  }
+  
 };
+
 
 #ifndef RUNNING_FRC_TESTS
 int main() { return frc::StartRobot<Robot>(); }
