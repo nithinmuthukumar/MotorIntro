@@ -9,8 +9,11 @@
 #include <frc/PWMVictorSPX.h>
 #include <frc/TimedRobot.h>
 #include <frc/livewindow/LiveWindow.h>
-#include <frc/RobotDrive.h>
+#include <frc/drive/DifferentialDrive.h>
 #include "ctre/Phoenix.h"
+#include "frc/smartdashboard/Smartdashboard.h"
+#include "networktables/NetworkTable.h"
+#include "networktables/NetworkTableInstance.h"
 
 using namespace frc;
 /**
@@ -23,8 +26,13 @@ using namespace frc;
  */
 
 class Robot : public frc::TimedRobot {
+  std::shared_ptr<NetworkTable> table = nt::NetworkTableInstance::GetDefault().GetTable("limelight");
+  double targetOffsetAngle_Horizontal = table->GetNumber("tx",0.0);
+  double targetOffsetAngle_Vertical = table->GetNumber("ty",0.0);
+  double targetArea = table->GetNumber("ta",0.0);
+  double targetSkew = table->GetNumber("ts",0.0);
   Joystick m_stick{0};
-  RobotDrive driveSys; // robot drive system
+  DifferentialDrive driveSys; // robot drive system
   PWMVictorSPX m_motor{0};
   LiveWindow *lw;
   int autoLoopCounter;
